@@ -10,9 +10,13 @@ Each skill is one directory with a `SKILL.md` at its root.
 
 ## Install
 
-Symlink a skill into the agent's skills directory:
+`install.sh` symlinks every skill into an agent's skills directory:
 
 ```bash
-ln -s ~/code/skills/create-worktree ~/.claude/skills/create-worktree
-ln -s ~/code/skills/remove-worktree ~/.claude/skills/remove-worktree
+./install.sh --claude   # ~/.claude/skills
+./install.sh --codex    # $CODEX_HOME/skills, default ~/.codex/skills
+./install.sh --all      # both
 ```
+
+An existing symlink is replaced. An existing real directory is replaced only
+when its contents match the repo copy; otherwise it is left alone and reported.
