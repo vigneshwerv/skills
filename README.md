@@ -5,7 +5,7 @@ Each skill is one directory with a `SKILL.md` at its root.
 
 | Skill | Purpose |
 | --- | --- |
-| `create-worktree` | Create a git worktree through herdr, run repo setup, split panes, and start a Codex agent with the task context. |
+| `create-worktree` | Create a git worktree through herdr, run repo setup, split panes, and start a worker agent with the task context. `--agent <kind>` picks the worker; the default is the agent running the skill. |
 | `remove-worktree` | Remove a herdr worktree after a check that no work is lost. |
 
 ## Install

@@ -1,14 +1,15 @@
 ---
 name: create-worktree
-description: Use whenever the user asks to create a worktree for a task (e.g. "create a worktree for X", "spin up a worktree", "make a worktree for FRA-1234"). Creates the worktree via herdr, runs repo setup, splits three even panes (Codex agent, Hunk review, user shell), and hands the agent the task context.
+description: Use whenever the user asks to create a worktree for a task (e.g. "create a worktree for X", "spin up a worktree", "make a worktree for FRA-1234"). Creates the worktree via herdr, runs repo setup, splits three even panes (worker agent, Hunk review, user shell), and hands the agent the task context. Accepts `--agent <kind>` to choose the worker (claude, codex, gemini, ...); defaults to the agent running the skill.
 ---
 
 # Create a worktree for a task
 
 Create worktrees with **herdr**, never with raw `git worktree add`. Requires `HERDR_ENV=1`; if herdr is unavailable, stop and tell the user instead of falling back to git.
 
-## 1. Determine the branch name and task context
+## 1. Determine the branch name, task context, and worker agent
 
+- **Worker agent kind**: if the arguments include `--agent <kind>`, use that kind and drop the flag from the task text. Otherwise use the kind of the agent executing this skill (Claude Code is `claude`, Codex is `codex`). If that cannot be determined, use `codex`. The kind must be one herdr supports; check with `herdr agent start --help` if unsure.
 - **Linear task** (the user names or links an issue like FRA-1234): fetch the issue with the Linear MCP `get_issue` tool. Use Linear's generated branch name (the issue's `gitBranchName`) — do not invent your own variant. Keep the issue title, description, and URL for the agent kickoff prompt in step 5.
 - **No Linear task**: use a short kebab-case slug describing the task, no prefix (e.g. `fix-balance-drift`). The user's own task description is the context for step 5.
 
@@ -61,11 +62,13 @@ herdr pane run <middle-pane-id> "hunk diff --watch"
 
 An empty worktree is fine — Hunk sits at zero files and fills in. Confirm the session is live with `hunk session list`; that session is what makes the agent's review notes in step 5 possible.
 
-Then start a Codex agent in the left (root) pane with a name derived from the task (must match `[a-z][a-z0-9_-]{0,31}`, e.g. `fra-7545`):
+Then start the worker agent of the chosen kind in the left (root) pane with a name derived from the task (must match `[a-z][a-z0-9_-]{0,31}`, e.g. `fra-7545`):
 
 ```bash
-herdr agent start <name> --kind codex --pane <root-pane-id>
+herdr agent start <name> --kind <kind> --pane <root-pane-id>
 ```
+
+When the kind is `claude`, enable remote control mode (`/rc`) in the agent. Other kinds have no equivalent; skip this.
 
 ## 5. Kick off the agent with task context
 
@@ -102,4 +105,4 @@ Rules to pass on:
 
 ## 6. Report
 
-Tell the user: branch name, worktree path, bootstrap status, the agent's name and pane (left), that Hunk is watching the worktree in the middle pane and is where the agent's review notes will land, and that the right pane is their own shell. Do not implement the task yourself — the spawned agent owns it.
+Tell the user: branch name, worktree path, bootstrap status, the agent's kind, name and pane (left), that Hunk is watching the worktree in the middle pane and is where the agent's review notes will land, and that the right pane is their own shell. Do not implement the task yourself — the spawned agent owns it.
