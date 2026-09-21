@@ -1,0 +1,5 @@
+# Editor swap and backup files
+*.swp
+*.swo
+*~
+.DS_Store
