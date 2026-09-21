@@ -68,7 +68,16 @@ Then start the worker agent of the chosen kind in the left (root) pane with a na
 herdr agent start <name> --kind <kind> --pane <root-pane-id>
 ```
 
-When the kind is `claude`, enable remote control mode (`/rc`) in the agent. Other kinds have no equivalent; skip this.
+Kind-specific notes. Native agent arguments go after `--`:
+
+- `claude`: after it starts, enable remote control mode by sending `/rc`.
+- `codex`: start it with `--approve-for-me`, so approval requests are reviewed automatically inside the workspace-write sandbox instead of blocking on the user:
+
+  ```bash
+  herdr agent start <name> --kind codex --pane <root-pane-id> -- --approve-for-me
+  ```
+
+Other kinds need nothing extra.
 
 ## 5. Kick off the agent with task context
 
